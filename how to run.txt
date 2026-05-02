@@ -1,0 +1,5 @@
+Run these commands in the python terminal:
+
+cd "C:\Users\Matty\Documents\College Notes & Assignments\Year 5\Data Visualisation and Insight\CAs\CA2\Data-Visualization-CA2\code"
+
+py -m shiny run app.py
