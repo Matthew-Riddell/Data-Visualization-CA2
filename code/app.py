@@ -272,15 +272,40 @@ def server(input, output, session):
         return plot_station(filtered_station())
 
 
+    # reactive function for the table to show times and avg available bikes
+    @reactive.calc
+    def station_hour_table():
+        if input.station_select() == "All":
+            return pd.DataFrame()
+
+        df = station_hour.copy()
+
+        # filter selected station
+        df = df[df["NAME"] == input.station_select()]
+
+        # group by station and hour
+        df = (
+            df.groupby(["NAME", "HOUR"], as_index=False)["AVAILABLE_BIKES"]
+            .mean()
+        )
+
+        # format hour 
+        df["TIME"] = df["HOUR"].apply(lambda x: f"{int(x):02d}:00")
+
+        # round to the nearest whole number
+        df["AVAILABLE_BIKES"] = df["AVAILABLE_BIKES"].round(0).astype(int)
+
+        # reorder columns
+        df = df[["NAME", "TIME", "AVAILABLE_BIKES"]]
+
+        return df
+    
+
     # Table for Stations under the dashboard dropdown
     @output
     @render.table
     def station_table():
-        if input.station_select() == "All":
-            return pd.DataFrame()  # hides the table if none are selected
-
-        df = filtered_station()[["NAME", "AVAILABLE_BIKES", "LATITUDE", "LONGITUDE"]]
-        return df
+        return station_hour_table()
 
 
 # launch the app
