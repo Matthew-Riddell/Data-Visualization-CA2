@@ -83,7 +83,11 @@ def plot_daily(df):
         df,
         x="DATE",
         y="AVAILABLE_BIKES",
-        title="Daily Available Bikes (City-wide)"
+        title="Daily Available Bikes (City-wide)",
+        labels={
+            "DATE": "Date",
+            "AVAILABLE_BIKES": "Available bikes"
+        }
     )
     fig.update_layout(template="plotly_white")
     return fig
@@ -94,7 +98,11 @@ def plot_hourly(df):
         df,
         x="HOUR",
         y="AVAILABLE_BIKES",
-        title="Hourly Pattern"
+        title="Hourly Pattern",
+        labels={
+            "HOUR": "Hour of day",
+            "AVAILABLE_BIKES": "Available bikes"
+        }
     )
     fig.update_layout(template="plotly_white")
     return fig
@@ -102,7 +110,11 @@ def plot_hourly(df):
 
 def plot_station(df):
     fig = px.bar(df, x="NAME", y="AVAILABLE_BIKES",
-                 title="Average Bikes per Station")
+                 title="Average Bikes per Station",
+                 labels={
+            "NAME": "Station",
+            "AVAILABLE_BIKES": "Available bikes"
+        })
     fig.update_layout(template="plotly_white", xaxis_tickangle=-45)
     return fig
 
@@ -117,7 +129,7 @@ def plot_week(df):
         name = "Weekend" if label == 1 else "Weekday"
         ax.plot(g["HOUR"], g["AVAILABLE_BIKES"], label=name)
 
-    ax.set_title("Weekday vs Weekend Pattern")
+    ax.set_title("Weekday vs Weekend Pattern (City-wide)")
     ax.legend()
     ax.grid(True, alpha=0.3)
 
