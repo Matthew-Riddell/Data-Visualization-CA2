@@ -1,7 +1,7 @@
 # Matthew Riddell
 # D00245674
 # Data Visualization & Insight CA3
-# Sjiny app for Bikesharing in Dublin City Center
+# Shiny app for Bikesharing in Dublin City Center
 
 # Code sourced from:
 # Exercise code (shiny part 2 and part 3)
@@ -78,16 +78,24 @@ def create_map(df):
 
 
 # plotly plots
-def plot_daily():
-    fig = px.line(daily, x="DATE", y="AVAILABLE_BIKES",
-                  title="Daily Available Bikes")
+def plot_daily(df):
+    fig = px.line(
+        df,
+        x="DATE",
+        y="AVAILABLE_BIKES",
+        title="Daily Available Bikes (City-wide)"
+    )
     fig.update_layout(template="plotly_white")
     return fig
 
 
-def plot_hourly():
-    fig = px.line(hourly, x="HOUR", y="AVAILABLE_BIKES",
-                  title="Hourly Pattern")
+def plot_hourly(df):
+    fig = px.line(
+        df,
+        x="HOUR",
+        y="AVAILABLE_BIKES",
+        title="Hourly Pattern"
+    )
     fig.update_layout(template="plotly_white")
     return fig
 
@@ -209,11 +217,11 @@ app_ui = ui.page_fluid(
 
                     ui.layout_columns(
                         ui.div(output_widget("map_dash"), class_="card"),
-                        ui.div(output_widget("daily_dash"), class_="card")
+                        ui.div(output_widget("hourly_dash"), class_="card")
                     ),
 
                     ui.layout_columns(
-                        ui.div(output_widget("hourly_dash"), class_="card"),
+                        ui.div(output_widget("daily_dash"), class_="card"),
                         ui.div(ui.output_plot("week_dash"), class_="card")
                     ),
 
@@ -246,8 +254,8 @@ app_ui = ui.page_fluid(
             )
         ),
 
-        ui.nav_panel("Daily", ui.card(output_widget("daily_page"))),
         ui.nav_panel("Hourly", ui.card(output_widget("hourly_page"))),
+        ui.nav_panel("Daily", ui.card(output_widget("daily_page"))),
         ui.nav_panel("Week", ui.card(ui.output_plot("week_page"))),
         ui.nav_panel("Stations", ui.card(output_widget("station_page")))
     )
@@ -269,7 +277,6 @@ def server(input, output, session):
     @render.text
     def selected_time():
         return f"Selected Time: {input.hour_slider():02d}:00"
-        
     
 
     @reactive.calc
@@ -295,6 +302,26 @@ def server(input, output, session):
         )
 
         return df
+    
+
+    @reactive.calc
+    def hourly_data():
+        df = station_hour.copy()
+
+        # station-specific 
+        if input.station_select() != "All":
+            df = df[df["NAME"] == input.station_select()]
+            return df.groupby("HOUR", as_index=False)["AVAILABLE_BIKES"].mean()
+
+        # ALL stations
+        df = df.groupby("HOUR", as_index=False)["AVAILABLE_BIKES"].mean()
+
+        return df
+    
+    @reactive.calc
+    def daily_data():
+        return daily.copy()
+        
 
     # maps
     @output
@@ -311,23 +338,23 @@ def server(input, output, session):
     @output
     @render_widget
     def daily_dash():
-        return plot_daily()
+        return plot_daily(daily_data())
 
     @output
     @render_widget
     def daily_page():
-        return plot_daily()
+        return plot_daily(daily_data())
 
     # Hourly plots
     @output
     @render_widget
     def hourly_dash():
-        return plot_hourly()
+        return plot_hourly(hourly_data())
 
     @output
     @render_widget
     def hourly_page():
-        return plot_hourly()
+        return plot_hourly(hourly_data())
 
     # Week plots
     @output
