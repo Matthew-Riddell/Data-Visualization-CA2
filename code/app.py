@@ -7,13 +7,14 @@
 # Exercise code (shiny part 2 and part 3)
 # https://shiny.posit.co/py/docs/overview.html
 # https://shiny.posit.co/py/api/express/reactive.calc.html
+# https://ipyleaflet.readthedocs.io/en/latest/layers/circle_marker.html
 
 from shiny import App, ui, render, reactive
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 from shinywidgets import render_widget, output_widget
-from ipyleaflet import Map, Marker, basemaps, basemap_to_tiles
+from ipyleaflet import Map, CircleMarker, Marker, basemaps, basemap_to_tiles
 from ipywidgets import HTML
 
 # load the datasets
@@ -37,12 +38,32 @@ def create_map(df):
     )
 
     for _, row in df.iterrows():
+
+        bikes = row["AVAILABLE_BIKES"]
+
+        # icon is a different colour based on the number of available bikes
+        if bikes < 5:
+            color = "red"
+        elif bikes < 10:
+            color = "orange"
+        else:
+            color = "green"
+
         popup_html = HTML(
             f"<b>{row['NAME']}</b><br>"
-            f"Avg bikes: {round(row['AVAILABLE_BIKES'], 0)}"
+            f"Avg bikes: {round(bikes, 0)}"
         )
 
-        marker = Marker(location=(row["LATITUDE"], row["LONGITUDE"]))
+        # https://ipyleaflet.readthedocs.io/en/latest/layers/circle_marker.html
+        # creates a cirular marker on the map
+        marker = CircleMarker(
+            location=(row["LATITUDE"], row["LONGITUDE"]),
+            radius=6,
+            color=color,
+            fill_color=color,
+            fill_opacity=0.8
+        )
+
         marker.popup = popup_html
         m.add_layer(marker)
 
