@@ -30,9 +30,12 @@ def create_map(df):
     center_lat = df["LATITUDE"].mean()
     center_lon = df["LONGITUDE"].mean()
 
+    df = df.copy()
+    df["RATIO"] = df["AVAILABLE_BIKES"] / df["BIKE_STANDS"]
+
     m = Map(
         center=(center_lat, center_lon),
-        zoom=12,
+        zoom=13,
         basemap=basemap_to_tiles(basemaps.OpenStreetMap.Mapnik),
         scroll_wheel_zoom=True
     )
@@ -40,25 +43,29 @@ def create_map(df):
     for _, row in df.iterrows():
 
         bikes = row["AVAILABLE_BIKES"]
+        capacity = row["BIKE_STANDS"]
+        ratio = row["RATIO"]
 
-        # icon is a different colour based on the number of available bikes
-        if bikes < 5:
+        # # icon is a different colour based on the number of available bikes
+        if ratio < 0.3:
             color = "red"
-        elif bikes < 10:
+        elif ratio < 0.7:
             color = "orange"
         else:
             color = "green"
 
         popup_html = HTML(
             f"<b>{row['NAME']}</b><br>"
-            f"Avg bikes: {round(bikes, 0)}"
+            f"Available bikes: {int(round(bikes))} / Capacity: {int(capacity)}"
         )
+
+        radius = int(4 + (ratio * 10))
 
         # https://ipyleaflet.readthedocs.io/en/latest/layers/circle_marker.html
         # creates a cirular marker on the map
         marker = CircleMarker(
             location=(row["LATITUDE"], row["LONGITUDE"]),
-            radius=6,
+            radius=radius,
             color=color,
             fill_color=color,
             fill_opacity=0.8
@@ -218,7 +225,27 @@ app_ui = ui.page_fluid(
         ),
 
         # navbar for the pages
-        ui.nav_panel("Map", ui.card(output_widget("map_page"))),
+        ui.nav_panel(
+            "Map",
+            ui.card(
+
+                ui.h3("Bike Availability by Time"),
+
+                ui.input_slider(
+                    "hour_slider",
+                    "Select Hour",
+                    min=0,
+                    max=23,
+                    value=12,
+                    step=1
+                ),
+
+                ui.output_text("selected_time"),
+
+                output_widget("map_page")
+            )
+        ),
+
         ui.nav_panel("Daily", ui.card(output_widget("daily_page"))),
         ui.nav_panel("Hourly", ui.card(output_widget("hourly_page"))),
         ui.nav_panel("Week", ui.card(ui.output_plot("week_page"))),
@@ -236,6 +263,38 @@ def server(input, output, session):
         if input.station_select() == "All":
             return station
         return station[station["NAME"] == input.station_select()]
+    
+    # hour slider for map
+    @output
+    @render.text
+    def selected_time():
+        return f"Selected Time: {input.hour_slider():02d}:00"
+        
+    
+
+    @reactive.calc
+    def map_data():
+
+        # start from hourly station data
+        df = station_hour.copy()
+
+        # filter selected hour
+        df = df[df["HOUR"] == input.hour_slider()]
+
+        # aggregate bikes per station at that hour
+        df = df.groupby(
+            ["STATION ID", "NAME"],
+            as_index=False
+        )["AVAILABLE_BIKES"].mean()
+
+        # merge with station summary 
+        df = df.merge(
+            station[["STATION ID", "LATITUDE", "LONGITUDE", "BIKE_STANDS"]],
+            on="STATION ID",
+            how="left"
+        )
+
+        return df
 
     # maps
     @output
@@ -246,7 +305,7 @@ def server(input, output, session):
     @output
     @render_widget
     def map_page():
-        return create_map(filtered_station())
+        return create_map(map_data())
 
     # Daily plots
     @output
@@ -304,20 +363,29 @@ def server(input, output, session):
         # filter selected station
         df = df[df["NAME"] == input.station_select()]
 
-        # group by station and hour
+        # merge capacity
+        df = df.merge(
+            station[["STATION ID", "BIKE_STANDS"]],
+            on="STATION ID",
+            how="left"
+        )
+
+        # group by station + hour
         df = (
-            df.groupby(["NAME", "HOUR"], as_index=False)["AVAILABLE_BIKES"]
+            df.groupby(["NAME", "HOUR", "BIKE_STANDS"], as_index=False)
+            ["AVAILABLE_BIKES"]
             .mean()
         )
 
-        # format hour 
+        # format time
         df["TIME"] = df["HOUR"].apply(lambda x: f"{int(x):02d}:00")
 
-        # round to the nearest whole number
+        # round values
         df["AVAILABLE_BIKES"] = df["AVAILABLE_BIKES"].round(0).astype(int)
+        df["BIKE_STANDS"] = df["BIKE_STANDS"].astype(int)
 
         # reorder columns
-        df = df[["NAME", "TIME", "AVAILABLE_BIKES"]]
+        df = df[["NAME", "TIME", "AVAILABLE_BIKES", "BIKE_STANDS"]]
 
         return df
     
