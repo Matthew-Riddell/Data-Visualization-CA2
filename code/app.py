@@ -18,11 +18,11 @@ from ipyleaflet import Map, CircleMarker, Marker, basemaps, basemap_to_tiles
 from ipywidgets import HTML
 
 # load the datasets
-hourly = pd.read_csv("C:/Users/Matty/Documents/College Notes & Assignments/Year 5/Data Visualisation and Insight/CAs/CA2/Data-Visualization-CA2/code/hourly.csv")
-station_hour = pd.read_csv("C:/Users/Matty/Documents/College Notes & Assignments/Year 5/Data Visualisation and Insight/CAs/CA2/Data-Visualization-CA2/code/station_hour.csv")
-daily = pd.read_csv("C:/Users/Matty/Documents/College Notes & Assignments/Year 5/Data Visualisation and Insight/CAs/CA2/Data-Visualization-CA2/code/daily.csv")
-station = pd.read_csv("C:/Users/Matty/Documents/College Notes & Assignments/Year 5/Data Visualisation and Insight/CAs/CA2/Data-Visualization-CA2/code/station_summary.csv")
-week = pd.read_csv("C:/Users/Matty/Documents/College Notes & Assignments/Year 5/Data Visualisation and Insight/CAs/CA2/Data-Visualization-CA2/code/week.csv")
+hourly = pd.read_csv("hourly.csv")
+station_hour = pd.read_csv("station_hour.csv")
+daily = pd.read_csv("daily.csv")
+station = pd.read_csv("station_summary.csv")
+week = pd.read_csv("week.csv")
 
 # interactive map 
 # adapted from exercise code
