@@ -1,5 +1,11 @@
+To run locally:
 Run these commands in the python terminal:
 
 cd "C:\Users\Matty\Documents\College Notes & Assignments\Year 5\Data Visualisation and Insight\CAs\CA2\Data-Visualization-CA2\code"
 
 py -m shiny run app.py
+
+
+
+To run deployed app:
+https://019df05a-92f5-8651-7514-1c7731512d9a.share.connect.posit.cloud/
