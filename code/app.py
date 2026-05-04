@@ -182,17 +182,61 @@ app_ui = ui.page_fluid(
         ui.nav_panel(
             "Home",
             ui.div(
-                ui.h1("Matthew's Dublin Bikesharing Dashboard"),
-                ui.p("A quick tool to see if there are any bikes available near you!"),
+
+                ui.h1("Dublin Bike Sharing Dashboard"),
+
+                ui.p(
+                    "This dashboard is designed to help commuters better plan trips through dublin city center using the Bike Sharing Program. "
+                    "Using this tools, users can observe bikesharing behavioral trends hourly, daily, weekday vs weekend, city-wide vs station specific. "
+                    "Using the map, users can navigate to each station and view the average availability for each time of the day, colour-coded to illustrate which stations have more available bikes at any given time. "
+                ),
+
+                ui.p(
+                    "This tool will inform commuters and city planning aswell as the bikesharing program. "
+                    "Knowing when a station is more available, informs the commuter and allows them to better plan their commute at a time when bikes are more available. "
+                    "City planners can use this tool to find areas on the map where coverage is low, allowing them to plan the development of more bike stations in the future. "
+                    "The bike sharing program itself can see trends and address availability issues by upgrading bike stations that have low capacity. "
+                ),
 
                 ui.hr(),
 
-                ui.h3("Features"),
+                ui.h3("Features"), 
+                ui.tags.ul( 
+                    ui.tags.li("Interactive bike station map"), 
+                    ui.tags.li("Observe daily & hourly trends"), 
+                    ui.tags.li("Observe weekday vs weekend patterns"), 
+                    ui.tags.li("Station by station analysis") 
+                    ),
+
+                ui.hr(),
+
+                ui.h3("Data Sources"),
+
+                ui.p(
+                    "The data used in this dashboard was modelled and transformed using the Dublin City Center bikesharing Dataset"
+                ),
+
                 ui.tags.ul(
-                    ui.tags.li("Interactive bike station map"),
-                    ui.tags.li("Observe daily & hourly trends"),
-                    ui.tags.li("Observe weekday vs weekend patterns"),
-                    ui.tags.li("Station by station analysis")
+                    ui.tags.li(
+                        ui.a(
+                            "GitHub Repository",
+                            href="https://github.com/Matthew-Riddell/Data-Visualization-CA2",
+                            target="_blank"
+                        )
+                    ),
+                    ui.tags.li(
+                        ui.a(
+                            "Dataset Source",
+                            href="https://www.kaggle.com/datasets/mexwell/dublinbikes-dcc-dataset",
+                            target="_blank"
+                        )
+                    )
+                ),
+
+                ui.hr(),
+
+                ui.p(
+                    "Matthew Riddell - Data Visualization & Insight CA2."
                 )
             )
         ),
