@@ -3,11 +3,13 @@
 # Data Visualization & Insight CA3
 # Shiny app for Bikesharing in Dublin City Center
 
-# Code sourced from:
+# Code references:
 # Exercise code (shiny part 2 and part 3)
 # https://shiny.posit.co/py/docs/overview.html
 # https://shiny.posit.co/py/api/express/reactive.calc.html
 # https://ipyleaflet.readthedocs.io/en/latest/layers/circle_marker.html
+# https://chatgpt.com/share/69f8cbd0-2b4c-83eb-8b7c-246bdec5fd56
+# https://chatgpt.com/share/69f8cba2-3cfc-83eb-b194-7fc82f36a9ff
 
 from shiny import App, ui, render, reactive
 import pandas as pd
