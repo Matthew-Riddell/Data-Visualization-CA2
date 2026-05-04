@@ -470,6 +470,13 @@ def server(input, output, session):
         # reorder columns
         df = df[["NAME", "TIME", "AVAILABLE_BIKES", "BIKE_STANDS"]]
 
+        df.columns = [
+        "Station",
+        "Time",
+        "Available Bikes",
+        "Capacity"
+        ]
+
         return df
     
 
